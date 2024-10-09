@@ -30,13 +30,13 @@ namespace queues {
         }
 
     public:
-        explicit SingleProducerSingleConsumerNonblockingQueue(size_t capacity)
+        explicit SingleProducerSingleConsumerNonblockingQueue(const size_t capacity)
             : capacity(capacity), items(new T[capacity]) {
         }
 
         SingleProducerSingleConsumerNonblockingQueue(SingleProducerSingleConsumerNonblockingQueue&& other) = delete;
 
-        ~SingleProducerSingleConsumerNonblockingQueue() {
+        ~SingleProducerSingleConsumerNonblockingQueue() override {
             delete[] items;
         }
 
