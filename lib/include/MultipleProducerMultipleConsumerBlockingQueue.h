@@ -75,8 +75,8 @@ namespace queues {
             const auto timeToAcquireLock = duration_cast<typeof(timeout)>(steady_clock::now() - functionStartTime);
             if (!lock.owns_lock() || timeToAcquireLock >= timeout)
                 return false; // Timed out waiting for lock.
-            timeout -= timeToAcquireLock;
-            if (!readyToWrite.wait_for(lock, timeout, [&] { return size < capacity; }))
+            const auto remainingTimeout = timeout - timeToAcquireLock;
+            if (!readyToWrite.wait_for(lock, remainingTimeout, [&] { return size < capacity; }))
                 return false; // Timed out waiting for space in queue.
             unsafeEnqueue(lock, item);
             return true;
@@ -105,7 +105,7 @@ namespace queues {
             if (!lock.owns_lock() || timeToAcquireLock >= timeout)
                 return false; // Timed out waiting for lock.
             const auto remainingTimeout = timeout - timeToAcquireLock;
-            if (!readyToRead.wait_for(lock, timeout, [&] { return size > 0; }))
+            if (!readyToRead.wait_for(lock, remainingTimeout, [&] { return size > 0; }))
                 return false; // Timed out waiting for space in queue.
             unsafeDequeue(lock, item);
             return true;
